@@ -1,0 +1,52 @@
+string $MovableNmsp = "Ada_full_rig:";
+string $FixedNmsp = "MI_Vicky_full_rig:"; 
+string $StartJnt = "DHIhead:spine_04";
+
+
+proc AlignJointPosition(string $FixedJnt,string $MovableNmsp) 
+{   
+    string $buffer[];
+    clear $buffer;
+    tokenize $FixedJnt ":" $buffer;
+    string $MovableJnt = $MovableNmsp + $buffer[1] + ":" + $buffer[2];
+    
+    CBunlockAttr ($MovableJnt + ".tx");
+    CBunlockAttr ($MovableJnt + ".ty");
+    CBunlockAttr ($MovableJnt + ".tz");    
+    CBunlockAttr ($MovableJnt + ".rx");
+    CBunlockAttr ($MovableJnt + ".ry");
+    CBunlockAttr ($MovableJnt + ".rz");    
+    CBunlockAttr ($MovableJnt + ".sx");
+    CBunlockAttr ($MovableJnt + ".sy");
+    CBunlockAttr ($MovableJnt + ".sz");
+    
+    CBdeleteConnection  ($MovableJnt + ".tx");
+    CBdeleteConnection  ($MovableJnt + ".ty");
+    CBdeleteConnection  ($MovableJnt + ".tz");    
+    CBdeleteConnection  ($MovableJnt + ".rx");
+    CBdeleteConnection  ($MovableJnt + ".ry");
+    CBdeleteConnection  ($MovableJnt + ".rz");    
+    CBdeleteConnection  ($MovableJnt + ".sx");
+    CBdeleteConnection  ($MovableJnt + ".sy");
+    CBdeleteConnection  ($MovableJnt + ".sz");
+    
+    select -r $MovableJnt;
+    select -add $FixedJnt;
+    MatchTransform;
+}
+
+$StartJnt = "DHIhead:spine_04";
+select -r ($FixedNmsp + $StartJnt);
+select -hi;
+for ($SelJnt in `ls -sl -type joint`)
+{   
+	AlignJointPosition $SelJnt $MovableNmsp;
+}
+
+$StartJnt = "DHIbody:root";
+select -r ($FixedNmsp + $StartJnt);
+select -hi;
+for ($SelJnt in `ls -sl -type joint`)
+{   
+	AlignJointPosition $SelJnt $MovableNmsp;
+}
